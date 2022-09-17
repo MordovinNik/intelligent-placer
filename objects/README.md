@@ -1,0 +1,12 @@
+# Объекты
+0) ![object 0](0.jpg "object 0")
+1) ![object 1](1.jpg "object 1")
+2) ![object 2](2.jpg "object 2")
+3) ![object 3](3.jpg "object 3")
+4) ![object 4](4.jpg "object 4")
+5) ![object 5](5.jpg "object 5")
+6) ![object 6](6.jpg "object 6")
+7) ![object 7](7.jpg "object 7")
+8) ![object 8](8.jpg "object 8")
+9) ![object 9](9.jpg "object 9")
+10) ![object 10](10.jpg "object 10")
