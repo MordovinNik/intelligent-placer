@@ -1,4 +1,5 @@
 # Объекты
+00) ![object 00](00.jpg "object 00")
 0) ![object 0](0.jpg "object 0")
 1) ![object 1](1.jpg "object 1")
 2) ![object 2](2.jpg "object 2")
