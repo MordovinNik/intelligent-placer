@@ -5,7 +5,7 @@ import numpy as np
 from random import randint
 import matplotlib.pyplot as plt
 
-MIN_CONTOUR_AREA = 10000
+MIN_CONTOUR_AREA = 2000
 MAX_COLOR_DIFFERENCE = 25
 DEBUG_CONTOURS = False
 DEBUG_POLYGON_FIND = False
@@ -13,24 +13,25 @@ DEBUG_POLYGON_FIND = False
 
 def get_contours(image):
     image_gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    image_gauss = cv2.GaussianBlur(image_gray, (5, 5), 0)
-    ret, image_threshold = cv2.threshold(image_gauss, 100, 255, cv2.THRESH_BINARY)
-    image_blured = cv2.GaussianBlur(image_threshold, (7, 7), 0)
-    contours, hierarchy = cv2.findContours(image_threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # image_gauss = cv2.GaussianBlur(image_gray, (5, 5), 0)
+    ret, image_threshold = cv2.threshold(image_gray, 100, 255, cv2.THRESH_BINARY_INV)
+    kernel = np.ones((2, 2), np.uint8)
+    image_dilated = cv2.dilate(image_threshold, kernel, iterations=1)
+    contours, hierarchy = cv2.findContours(image_dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     ext_contours = []
-    # for some reason, the entire image is outlined, so we take its child elements
     for i in range(len(contours)):
-        if hierarchy[0][i][3] == 0 and cv2.contourArea(contours[i]) > MIN_CONTOUR_AREA:
+        if cv2.contourArea(contours[i]) > MIN_CONTOUR_AREA:
             ext_contours.append(contours[i])
+            print(f"contour area: {cv2.contourArea(contours[i])}")
 
     if DEBUG_CONTOURS:
-        result = np.zeros((image_blured.shape[0], image_blured.shape[1], 3), dtype=np.uint8)
+        result = np.zeros((image_dilated.shape[0], image_dilated.shape[1], 3), dtype=np.uint8)
         for i in range(len(ext_contours)):
             color = (randint(0, 256), randint(0, 256), randint(0, 256))
             cv2.drawContours(result, ext_contours, i, color, 2, cv2.LINE_8, hierarchy, 0)
-        fig,(ax1,ax2) = plt.subplots(1,2)
-        ax1.imshow(image_threshold)
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        ax1.imshow(image_dilated)
         ax2.imshow(result)
         plt.show()
 
@@ -63,7 +64,7 @@ def find_polygon(image, contours, background_image):
             warnings.simplefilter("ignore", category=RuntimeWarning)
             avg = np.nanmean(np.nanmean(image_modified, axis=0, where=mask == 255), axis=0)
             diff = np.linalg.norm(avg - average)
-            max_diff = max(abs(avg-average))
+            max_diff = max(abs(avg - average))
             if min > diff:
                 min_i = i
                 min = diff
@@ -81,3 +82,5 @@ def find_polygon(image, contours, background_image):
         ax2.imshow(image_modified)
         plt.show()
     return min_i
+
+
